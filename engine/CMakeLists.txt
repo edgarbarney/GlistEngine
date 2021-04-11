@@ -119,6 +119,8 @@ set(SRC_FILES
 	${ENGINE_DIR}/base/gBasePlugin.cpp
 	${ENGINE_DIR}/media/gBaseSound.cpp
 	${ENGINE_DIR}/media/gFmodSound.cpp
+	${ENGINE_DIR}/media/gBaseVideo.cpp
+	${ENGINE_DIR}/media/gVideoDecoder.cpp
 	${ENGINE_DIR}/base/gBaseApp.cpp
 	${ENGINE_DIR}/base/gBaseCanvas.cpp
 	${ENGINE_DIR}/core/gBaseWindow.cpp
