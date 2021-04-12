@@ -13,7 +13,6 @@ gBaseVideo::gBaseVideo() {
 	isPaused = false;
 	decoder = new gVideoDecoder;
 	//currentFrame.load("engineassets/nullvideo.jpg");
-
 }
 
 gBaseVideo::~gBaseVideo() {
@@ -35,11 +34,11 @@ std::string gBaseVideo::getFileName(const std::string& fname) {
 }
 
 int gBaseVideo::load(std::string fullPath) {
-	videoDir = fullPath;
-	directory = getDirName(videoDir);
-	path = getFileName(videoDir);
+	videodir = fullPath;
+	directory = getDirName(videodir);
+	path = getFileName(videodir);
 
-	return decoder->decodeVideo(videoDir);
+	return decoder->decodeVideo(videodir);
 }
 
 int gBaseVideo::loadVideo(std::string fullPath) {
@@ -48,7 +47,7 @@ int gBaseVideo::loadVideo(std::string fullPath) {
 
 
 void gBaseVideo::play() {
-	decoder->decodeVideo(videoDir);
+	decoder->decodeVideo(videodir);
 }
 
 void gBaseVideo::stop() {
@@ -60,8 +59,8 @@ void gBaseVideo::close() {
 }
 
 void gBaseVideo::draw(int x, int y) {
-	currentFrame = *(decoder->getVideoFrame(1));
-	currentFrame.draw(x, y);
+	currentframe = *(decoder->getVideoFrame(5));
+	currentframe.draw(x, y);
 }
 
 void seekMilisec(int position) {

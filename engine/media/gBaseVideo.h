@@ -36,13 +36,13 @@ public:
 	float audioVolume; //Preserved for audio
 	bool isLooping;
 	bool isPaused;
-	gImage currentFrame; // Feed to gImage TEMPORARILY!!!
+	gImage currentframe; // Feed to gImage TEMPORARILY!!!
 
 private:
 	std::string getDirName(const std::string& fname);
 	std::string getFileName(const std::string& fname);
 
-	std::string videoDir, directory, path; // We'll work with videodir, mostly.
+	std::string videodir, directory, path; // We'll work with videodir, mostly.
 	std::string codec, extension;
 	gVideoDecoder* decoder;
 };

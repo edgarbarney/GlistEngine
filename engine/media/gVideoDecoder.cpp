@@ -8,8 +8,9 @@
 #include "gVideoDecoder.h"
 #include "gUtils.h"
 
+#include "stb/stb_image.h"
+
 gVideoDecoder::gVideoDecoder() {
-	pFrameImage = new gImage();
 	videoindex = 0;
 	y_size = 0;
 	ret, got_picture = 0;
@@ -18,7 +19,10 @@ gVideoDecoder::gVideoDecoder() {
 
 gVideoDecoder::~gVideoDecoder() {
 	// Free Memory
-	delete pFrameImage;
+	for (auto &attack : pFrameImage)
+	{
+		delete attack;
+	}
 	av_packet_unref(packet);
 	sws_freeContext(img_convert_ctx);
 	av_frame_free(&pFrameBGR);
@@ -102,34 +106,39 @@ int gVideoDecoder::decodeVideo(std::string filefullpath) {
 	// Format conversion
 	img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
 		pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_BGR24, SWS_BICUBIC, NULL, NULL, NULL);
+
+	while (av_read_frame(pFormatCtx, packet) >= 0) {
+			if (packet->stream_index == videoindex) {
+				// Decoding
+				ret = avcodec_decode_video2(pCodecCtx, pFrame, &got_picture, packet);
+				if (ret < 0) {
+					std::cout << "Decode Error." << std::endl;
+					return -1;
+				}
+				if (got_picture) {
+					sws_scale(img_convert_ctx, (const uint8_t* const*)pFrame->data, pFrame->linesize, 0, pCodecCtx->height,
+						pFrameBGR->data, pFrameBGR->linesize);
+
+					std::cout << "Decode frame index: " << frame_cnt << std::endl;
+					frame_cnt++;
+
+					// Display image
+					gImage* tempimg = new gImage;
+					tempimg->setImageData(pFrameBGR->data[0]);
+					pFrameImage.push_back(tempimg);
+				}
+			}
+			av_free_packet (packet);
+		}
+		sws_freeContext(img_convert_ctx);
+		av_frame_free(&pFrameBGR);
+		av_frame_free(&pFrame);
+		avcodec_close(pCodecCtx);
+		avformat_close_input(&pFormatCtx);
+	gLogi("gVideo") << "Done saving frames" << std::endl;
 	return 0;
 }
 
 gImage* gVideoDecoder::getVideoFrame(int frame_cnt){
-	gLogi("gVideo") << "REACHED." << std::endl;
-	// Read frame
-	if (av_read_frame(pFormatCtx, packet) >= 0) {
-		//if (packet->stream_index != videoindex) {
-		//	return nullptr;
-		//} else {
-			// Decoding
-			ret = avcodec_receive_packet(pCodecCtx, packet);
-			ret = avcodec_receive_frame(pCodecCtx, pFrame);
-			if (ret < 0) {
-				gLogi("gVideo") << "Decode Error." << std::endl;
-				return nullptr;
-			}
-			if (got_picture) {
-				sws_scale(img_convert_ctx, (const uint8_t* const*)pFrame->data, pFrame->linesize, 0, pCodecCtx->height,
-					pFrameBGR->data, pFrameBGR->linesize);
-
-				gLogi("gVideo") << "Decode frame index: " << frame_cnt << std::endl;
-
-				// Display image
-				pFrameImage->setImageData(pFrameBGR->data[0]);
-				return pFrameImage;
-			}
-		//}
-	}
-	return nullptr;
+	return pFrameImage.at(frame_cnt);
 }
