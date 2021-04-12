@@ -51,6 +51,10 @@ std::string gObject::gGetImagesDir() {
 	return exepath + "assets/images/";
 }
 
+std::string gObject::gGetVideosDir() {
+	return exepath + "assets/videos/";
+}
+
 std::string gObject::gGetFontsDir() {
 	return exepath + "assets/fonts/";
 }

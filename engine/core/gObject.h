@@ -40,6 +40,7 @@ public:
 	static std::string gGetAssetsDir();
 	static std::string gGetFilesDir();
 	static std::string gGetImagesDir();
+	static std::string gGetVideosDir();
 	static std::string gGetFontsDir();
 	static std::string gGetModelsDir();
 	static std::string gGetTexturesDir();
