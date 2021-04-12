@@ -98,11 +98,6 @@ int gVideoDecoder::decodeVideo(std::string filefullpath) {
 	av_image_fill_arrays (pFrameBGR->data, pFrameBGR->linesize, out_buffer, AV_PIX_FMT_BGR24, pCodecCtx->width, pCodecCtx->height, 1);
 	packet = (AVPacket *)av_malloc(sizeof(AVPacket));
 
-	// Output detailed information-----------------------------
-	gLogi("gVideo") << "--------------- File Information ----------------" << std::endl;
-	av_dump_format (pFormatCtx, 0 , filepath, 0 );
-	gLogi("gVideo") << "-------------------------------------------------" << std::endl;
-
 	// Format conversion
 	img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
 		pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_BGR24, SWS_BICUBIC, NULL, NULL, NULL);
