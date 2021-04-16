@@ -10,6 +10,7 @@
 
 #include "gNode.h"
 #include "gImage.h"
+#include "gFbo.h"
 #include "gVideoDecoder.h"
 
 class gBaseVideo: public gNode {
@@ -21,7 +22,7 @@ public:
 	int load(std::string fullPath);
 	int loadVideo(std::string fullPath);
 
-	void play();
+	void play(int w, int h);
 	void stop();
 	void close();
 	void draw(int x, int y);
@@ -36,7 +37,7 @@ public:
 	float audioVolume; //Preserved for audio
 	bool isLooping;
 	bool isPaused;
-	gImage currentframe; // Feed to gImage TEMPORARILY!!!
+	AVFrame* currentframe; // Feed to gImage TEMPORARILY!!!
 
 private:
 	std::string getDirName(const std::string& fname);
@@ -45,6 +46,7 @@ private:
 	std::string videodir, directory, path; // We'll work with videodir, mostly.
 	std::string codec, extension;
 	gVideoDecoder* decoder;
+	gFbo* fbo;
 };
 
 #endif /* MEDIA_gBaseVideo_H_ */

@@ -19,7 +19,7 @@ gVideoDecoder::gVideoDecoder() {
 
 gVideoDecoder::~gVideoDecoder() {
 	// Free Memory
-	for (auto &attack : pFrameImage)
+	for (auto &attack : pFrameVector)
 	{
 		delete attack;
 	}
@@ -118,9 +118,7 @@ int gVideoDecoder::decodeVideo(std::string filefullpath) {
 					frame_cnt++;
 
 					// Display image
-					gImage* tempimg = new gImage;
-					tempimg->setImageData(pFrameBGR->data[0]);
-					pFrameImage.push_back(tempimg);
+					pFrameVector.push_back(pFrameBGR);
 				}
 			}
 			av_free_packet (packet);
@@ -134,6 +132,6 @@ int gVideoDecoder::decodeVideo(std::string filefullpath) {
 	return 0;
 }
 
-gImage* gVideoDecoder::getVideoFrame(int frame_cnt){
-	return pFrameImage.at(frame_cnt);
+AVFrame* gVideoDecoder::getVideoFrame(int frame_cnt){
+	return pFrameVector.at(frame_cnt);
 }

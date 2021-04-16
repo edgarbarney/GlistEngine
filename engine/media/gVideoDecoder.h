@@ -31,8 +31,8 @@ public:
 
 
 	int decodeVideo(std::string filefullpath);
-	gImage* getVideoFrame(int frame_cnt);
-	std::vector <gImage*> pFrameImage; // We should contain all frames within RAM for now.
+	AVFrame* getVideoFrame(int frame_cnt);
+	std::vector <AVFrame*> pFrameVector; // We should contain all frames within RAM for now.
 
 private:
 	AVFormatContext	*pFormatCtx;

@@ -7,16 +7,24 @@
 
 #include "gBaseVideo.h"
 
+#if defined(WIN32) || defined(LINUX)
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
+
 gBaseVideo::gBaseVideo() {
 	audioVolume = 10; //Preserved for audio
 	isLooping = false;
 	isPaused = false;
 	decoder = new gVideoDecoder;
+	fbo = new gFbo;
 	//currentFrame.load("engineassets/nullvideo.jpg");
 }
 
 gBaseVideo::~gBaseVideo() {
 	delete decoder;
+	delete fbo;
 }
 
 std::string gBaseVideo::getDirName(const std::string& fname) {
@@ -46,8 +54,9 @@ int gBaseVideo::loadVideo(std::string fullPath) {
 }
 
 
-void gBaseVideo::play() {
-	decoder->decodeVideo(videodir);
+void gBaseVideo::play(int w, int h) {
+	//decoder->decodeVideo(videodir);
+	fbo->allocate(w, h, false);
 }
 
 void gBaseVideo::stop() {
@@ -59,8 +68,25 @@ void gBaseVideo::close() {
 }
 
 void gBaseVideo::draw(int x, int y) {
-	currentframe = *(decoder->getVideoFrame(5));
-	currentframe.draw(x, y);
+	currentframe = decoder->getVideoFrame(5);
+
+	unsigned int texture = -1;
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_BGR, currentframe->width, currentframe->height, 0, GL_BGR, GL_UNSIGNED_BYTE, currentframe->data[0]);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, 0, currentframe->width, currentframe->height, 0, GL_BGR, GL_UNSIGNED_BYTE, currentframe->data[0]);
+
+	fbo->bind();
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+	fbo->unbind();
+
+	fbo->draw(x, y);
 }
 
 void seekMilisec(int position) {
