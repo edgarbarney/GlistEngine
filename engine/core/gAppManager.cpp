@@ -17,7 +17,7 @@
 #endif
 
 
-void gStartEngine(gBaseApp *baseApp, std::string appName, int windowMode, int width, int height) {
+void gStartEngine(gBaseApp* baseApp, std::string appName, int windowMode, int width, int height) {
 	gAppManager appmanager;
 	gGLFWWindow gbwindow;
 	gbwindow.setAppManager(&appmanager);
@@ -25,7 +25,18 @@ void gStartEngine(gBaseApp *baseApp, std::string appName, int windowMode, int wi
 	gbwindow.setTitle(appName);
 	appmanager.setWindow(&gbwindow);
 	baseApp->setAppManager(&appmanager);
-	appmanager.runApp(appName, baseApp, width, height, windowMode);
+	appmanager.runApp(appName, baseApp, width, height, windowMode, width, height, gRenderer::SCREENSCALING_AUTO);
+}
+
+void gStartEngine(gBaseApp* baseApp, std::string appName, int windowMode, int width, int height, int screenScaling, int unitWidth, int unitHeight) {
+	gAppManager appmanager;
+	gGLFWWindow gbwindow;
+	gbwindow.setAppManager(&appmanager);
+	if (appName == "") appName = "GlistApp";
+	gbwindow.setTitle(appName);
+	appmanager.setWindow(&gbwindow);
+	baseApp->setAppManager(&appmanager);
+	appmanager.runApp(appName, baseApp, width, height, windowMode, unitWidth, unitHeight, screenScaling);
 }
 
 
@@ -58,7 +69,7 @@ gAppManager::gAppManager() {
 gAppManager::~gAppManager() {
 }
 
-void gAppManager::runApp(std::string appName, gBaseApp *baseApp, int width, int height, int windowMode) {
+void gAppManager::runApp(std::string appName, gBaseApp *baseApp, int width, int height, int windowMode, int unitWidth, int unitHeight, int screenScaling) {
 	appname = appName;
 	app = baseApp;
 
@@ -68,6 +79,8 @@ void gAppManager::runApp(std::string appName, gBaseApp *baseApp, int width, int 
 	tempbasecanvas = new gBaseCanvas(app);
 //	tempbasecanvas->loadRenderMaterials();
 	tempbasecanvas->setScreenSize(width, height);
+	tempbasecanvas->setUnitScreenSize(unitWidth, unitHeight);
+	tempbasecanvas->setScreenScaling(screenScaling);
 
 	canvasmanager = new gCanvasManager();
 
@@ -120,6 +133,10 @@ void gAppManager::setCurrentCanvas(gBaseCanvas *baseCanvas) {
 	canvasmanager->setCurrentCanvas(canvas);
 }
 
+gBaseCanvas* gAppManager::getCurrentCanvas() {
+	return canvas;
+}
+
 void gAppManager::setScreenSize(int width, int height) {
 	tempbasecanvas->setScreenSize(width, height);
 }
@@ -158,6 +175,10 @@ void gAppManager::onKeyEvent(int key, int action) {
 
 void gAppManager::onMouseMoveEvent(double xpos, double ypos) {
 	if (!canvasmanager->getCurrentCanvas()) return;
+	if (gRenderer::getScreenScaling() > gRenderer::SCREENSCALING_NONE) {
+		xpos = gRenderer::scaleX(xpos);
+		ypos = gRenderer::scaleY(ypos);
+	}
 	if (pressed) canvasmanager->getCurrentCanvas()->mouseDragged(xpos, ypos, pressed);
 	else canvasmanager->getCurrentCanvas()->mouseMoved(xpos, ypos);
 }
@@ -169,11 +190,19 @@ void gAppManager::onMouseButtonEvent(int button, int action, double xpos, double
 	case GLFW_PRESS:
 		buttonpressed[button] = true;
 		pressed |= myPow(2, button + 1);
+		if (gRenderer::getScreenScaling() > gRenderer::SCREENSCALING_NONE) {
+			xpos = gRenderer::scaleX(xpos);
+			ypos = gRenderer::scaleY(ypos);
+		}
 		canvasmanager->getCurrentCanvas()->mousePressed(xpos, ypos, button);
 		break;
 	case GLFW_RELEASE:
 		buttonpressed[button] = false;
 		pressed &= ~myPow(2, button + 1);
+		if (gRenderer::getScreenScaling() > gRenderer::SCREENSCALING_NONE) {
+			xpos = gRenderer::scaleX(xpos);
+			ypos = gRenderer::scaleY(ypos);
+		}
 		canvasmanager->getCurrentCanvas()->mouseReleased(xpos, ypos, button);
 		break;
 	}

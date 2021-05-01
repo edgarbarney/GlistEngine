@@ -46,17 +46,33 @@ int gGetCullingDirection();
 
 class gRenderer: public gObject {
 public:
+	static const int SCREENSCALING_NONE, SCREENSCALING_MIPMAP, SCREENSCALING_AUTO;
 	static const int DEPTHTESTTYPE_LESS, DEPTHTESTTYPE_ALWAYS;
 
 	gRenderer();
 	virtual ~gRenderer();
 
 	static void setScreenSize(int screenWidth, int screenHeight);
+	static void setUnitScreenSize(int unitWidth, int unitHeight);
+	static void setScreenScaling(int screenScaling);
 
 	int getWidth();
 	int getHeight();
 	int getScreenWidth();
 	int getScreenHeight();
+	int getUnitWidth();
+	int getUnitHeight();
+	static int getScreenScaling();
+
+	static void setCurrentResolution(int resolution);
+	static void setCurrentResolution(int screenWidth, int screenHeight);
+	static void setUnitResolution(int resolution);
+	static void setUnitResolution(int screenWidth, int screenHeight);
+	static int getResolution(int screenWidth, int screenHeight);
+	int getCurrentResolution();
+	int getUnitResolution();
+	static int scaleX(int x);
+	static int scaleY(int y);
 
 	void setColor(int r, int g, int b, int a = 255);
 	void setColor(gColor color);
@@ -102,25 +118,35 @@ public:
 	gShader* getImageShader();
 	gShader* getSkyboxShader();
 	gShader* getShadowmapShader();
+	gShader* getPbrShader();
+	gShader* getEquirectangularShader();
+	gShader* getIrradianceShader();
+	gShader* getPrefilterShader();
+	gShader* getBrdfShader();
 
 	void setProjectionMatrix(glm::mat4 projectionMatrix);
 	void setProjectionMatrix2d(glm::mat4 projectionMatrix2d);
 	void setViewMatrix(glm::mat4 viewMatrix);
+	void setCameraPosition(glm::vec3 cameraPosition);
 	glm::mat4 getProjectionMatrix();
 	glm::mat4 getProjectionMatrix2d();
 	glm::mat4 getViewMatrix();
+	glm::vec3 getCameraPosition();
 	void backupMatrices();
 	void restoreMatrices();
 
 
 private:
 	static int width, height;
-	gColor *rendercolor;
+	static int unitwidth, unitheight;
+	static int screenscaling;
+	static int currentresolution, unitresolution;
+	gColor* rendercolor;
 
-	gColor *lightingcolor;
+	gColor* lightingcolor;
 	bool islightingenabled;
 	glm::vec3 lightingposition;
-	gColor *globalambientcolor;
+	gColor* globalambientcolor;
 	int li;
 	std::vector<gLight*> scenelights;
 
@@ -128,18 +154,24 @@ private:
 	int depthtesttype;
 	unsigned int depthtesttypeid[2];
 
-	gShader *colorshader;
-	gShader *textureshader;
-	gShader *fontshader;
-	gShader *imageshader;
-	gShader *skyboxshader;
-	gShader *shadowmapshader;
+	gShader* colorshader;
+	gShader* textureshader;
+	gShader* fontshader;
+	gShader* imageshader;
+	gShader* skyboxshader;
+	gShader* shadowmapshader;
+	gShader* pbrshader;
+	gShader* equirectangularshader;
+	gShader* irradianceshader;
+	gShader* prefiltershader;
+	gShader* brdfshader;
 
 	glm::mat4 projectionmatrix;
 	glm::mat4 projectionmatrixold;
 	glm::mat4 projectionmatrix2d;
 	glm::mat4 viewmatrix;
 	glm::mat4 viewmatrixold;
+	glm::vec3 cameraposition;
 
 	const std::string getShaderSrcColorVertex();
 	const std::string getShaderSrcColorFragment();
@@ -153,6 +185,14 @@ private:
 	const std::string getShaderSrcSkyboxFragment();
 	const std::string getShaderSrcShadowmapVertex();
 	const std::string getShaderSrcShadowmapFragment();
+	const std::string getShaderSrcPbrVertex();
+	const std::string getShaderSrcPbrFragment();
+	const std::string getShaderSrcCubemapVertex();
+	const std::string getShaderSrcEquirectangularFragment();
+	const std::string getShaderSrcIrradianceFragment();
+	const std::string getShaderSrcPrefilterFragment();
+	const std::string getShaderSrcBrdfVertex();
+	const std::string getShaderSrcBrdfFragment();
 
 };
 

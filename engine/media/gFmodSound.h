@@ -18,6 +18,7 @@ public:
 	gFmodSound();
 	~gFmodSound();
 
+	int loadSound(std::string soundPath);
 	int load(std::string fullPath);
 	void play();
 	void setPaused(bool isPaused);
@@ -43,5 +44,6 @@ private:
     unsigned int version;
     void *extradriverdata = 0;
 };
+
 
 #endif /* MEDIA_GFMODSOUND_H_ */

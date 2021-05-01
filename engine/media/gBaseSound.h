@@ -9,8 +9,10 @@
 #define MEDIA_GBASESOUND_H_
 
 #include <string>
+#include "gObject.h"
 
-class gBaseSound {
+
+class gBaseSound : public gObject {
 public:
 	static const int LOOPTYPE_DEFAULT = 0, LOOPTYPE_NONE = 1, LOOPTYPE_NORMAL = 2;
 
@@ -18,6 +20,7 @@ public:
 	virtual ~gBaseSound();
 
 	virtual int load(std::string fullPath);
+	virtual int loadSound(std::string soundPath);
 	virtual void play();
 	virtual bool isLoaded();
 	virtual bool isPlaying();
@@ -35,6 +38,9 @@ public:
 
 	virtual void setVolume(float volume);
 	virtual float getVolume();
+
+	std::string getPath();
+
 
 protected:
 	bool isplaying, isloaded;
